@@ -4,8 +4,8 @@ type BeatmapMeta struct {
 	BeatmapsetId int
 	Artist       string
 	Title        string
-
-	Beatmaps []*Beatmap `gorm:"foreignKey:beatmapset_id;references:beatmapset_id"`
+	Downloaded   bool
+	Beatmaps     []*Beatmap `gorm:"foreignKey:beatmapset_id;references:beatmapset_id"`
 }
 
 type Beatmap struct {

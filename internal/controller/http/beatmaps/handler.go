@@ -2,13 +2,14 @@ package beatmaps
 
 import (
 	"maps-house/pkg/logger"
+	"strconv"
 
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
 const (
-	downloadRoute = "/d/{beatmapId}"
+	downloadRoute = "/d/{ID}"
 )
 
 var log *logger.Logger
@@ -27,5 +28,11 @@ func (h *handler) Register(router *router.Router) {
 }
 
 func (h *handler) DownloadMap(ctx *fasthttp.RequestCtx) {
-
+	setIdstr := ctx.UserValue("ID").(string)
+	setId, _ := strconv.Atoi(setIdstr)
+	if err := h.uc.CheckBeatmapAvailability(setId); err != nil {
+		ctx.WriteString(err.Error())
+		return
+	}
+	
 }

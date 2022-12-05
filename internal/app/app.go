@@ -36,7 +36,7 @@ func Run(conf *config.Config, log *logger.Logger) {
 	repo := repo.New(db)
 
 	// Initialize usecases
-	useCase := usecase.New(log, repo)
+	useCase := usecase.New(log, repo, conf.Dirs.PriorityDir, conf.Dirs.MainDir)
 
 	// Initialize controllers
 	http.NewApiRouter(r, log, useCase)

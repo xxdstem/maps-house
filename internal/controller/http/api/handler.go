@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	beatmapGet = "/api/beatmap/{beatmapId}"
+	beatmapGet = "/api/beatmap/{ID}"
 )
 
 var log *logger.Logger
@@ -29,7 +29,7 @@ func (h *handler) Register(router *router.Router) {
 }
 
 func (h *handler) GetBeatmap(ctx *fasthttp.RequestCtx) {
-	setIdstr := ctx.UserValue("beatmapId").(string)
+	setIdstr := ctx.UserValue("ID").(string)
 	setId, _ := strconv.Atoi(setIdstr)
 	result, err := h.uc.GetBeatmapBySetId(setId)
 	if err != nil {

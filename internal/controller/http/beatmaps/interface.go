@@ -9,4 +9,5 @@ type Handler interface {
 }
 
 type UseCase interface {
+	CheckBeatmapAvailability(setId int) error
 }

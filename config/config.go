@@ -16,7 +16,13 @@ type Config struct {
 	Host          string
 	SecretKey     string
 	Workers       int
+	Dirs          dirs
 	DB            db
+}
+
+type dirs struct {
+	PriorityDir string
+	MainDir     string
 }
 
 type db struct {
@@ -33,6 +39,10 @@ func NewConfig(logger *logger.Logger) (*Config, error) {
 	c := Config{
 		ListenAddress: ":8000",
 		Workers:       2,
+		Dirs: dirs{
+			PriorityDir: "./.data/priority/",
+			MainDir:     "./.data/main/",
+		},
 		DB: db{
 			Host:     "127.0.0.1",
 			DBname:   "ripple",
