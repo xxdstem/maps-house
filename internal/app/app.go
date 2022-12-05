@@ -14,8 +14,6 @@ import (
 	"gorm.io/gorm"
 )
 
-const listenAdress = ":8000"
-
 func Run(conf *config.Config, log *logger.Logger) {
 
 	// Build DSN string (probably could an another better way)
@@ -42,8 +40,8 @@ func Run(conf *config.Config, log *logger.Logger) {
 
 	// Initialize controllers
 	http.NewApiRouter(r, log, useCase)
-	log.Info("Listening app on ", listenAdress)
-	err = fasthttp.ListenAndServe(listenAdress, customRouter.Handler)
+	log.Info("Listening app on ", conf.ListenAddress)
+	err = fasthttp.ListenAndServe(conf.ListenAddress, customRouter.Handler)
 	if err != nil {
 		log.Fatal(err)
 	}

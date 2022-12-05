@@ -12,11 +12,11 @@ import (
 )
 
 type Config struct {
-	DSN       string
-	Host      string
-	SecretKey string
-	Workers   int
-	DB        db
+	ListenAddress string
+	Host          string
+	SecretKey     string
+	Workers       int
+	DB            db
 }
 
 type db struct {
@@ -31,7 +31,8 @@ var confFile = "./config.yml"
 
 func NewConfig(logger *logger.Logger) (*Config, error) {
 	c := Config{
-		Workers: 2,
+		ListenAddress: ":8000",
+		Workers:       2,
 		DB: db{
 			Host:     "127.0.0.1",
 			DBname:   "ripple",
