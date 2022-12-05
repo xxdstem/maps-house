@@ -5,5 +5,5 @@ import (
 )
 
 type Repository interface {
-	GetBeatmapBySetId(setId int) (*entity.Beatmap, error)
+	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
 }

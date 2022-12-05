@@ -27,7 +27,6 @@ func Run(conf *config.Config, log *logger.Logger) {
 	// Initialize Router
 	r := router.New()
 	r.GET("/", func(ctx *fasthttp.RequestCtx) {
-		log.Info("test")
 		ctx.WriteString("index.")
 	})
 	// Initialize repos

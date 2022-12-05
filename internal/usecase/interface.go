@@ -3,9 +3,9 @@ package usecase
 import "maps-house/internal/entity"
 
 type UseCase interface {
-	GetBeatmapBySetId(setId int) (*entity.Beatmap, error)
+	GetBeatmapBySetId(setId int) (*entity.BeatmapsDto, error)
 }
 
 type DbRepository interface {
-	GetBeatmapBySetId(setId int) (*entity.Beatmap, error)
+	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
 }

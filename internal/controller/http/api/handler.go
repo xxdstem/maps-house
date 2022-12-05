@@ -14,13 +14,15 @@ const (
 	beatmapGet = "/api/beatmap/{beatmapId}"
 )
 
+var log *logger.Logger
+
 type handler struct {
-	log *logger.Logger
-	uc  usecase.UseCase
+	uc usecase.UseCase
 }
 
 func New(l *logger.Logger, uc usecase.UseCase) Handler {
-	return &handler{log: l, uc: uc}
+	log = l
+	return &handler{uc: uc}
 }
 
 func (h *handler) Register(router *router.Router) {
@@ -32,13 +34,13 @@ func (h *handler) GetBeatmap(ctx *fasthttp.RequestCtx) {
 	setId, _ := strconv.Atoi(setIdstr)
 	result, err := h.uc.GetBeatmapBySetId(setId)
 	if err != nil {
-		h.log.Error(err)
+		log.Error(err)
 		ctx.WriteString(err.Error())
 		return
 	}
 	rawBytes, err := sonic.Marshal(result)
 	if err != nil {
-		h.log.Error(err)
+		log.Error(err)
 		ctx.WriteString(err.Error())
 		return
 	}

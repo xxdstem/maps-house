@@ -5,20 +5,22 @@ import (
 	"maps-house/pkg/logger"
 )
 
+var log *logger.Logger
+
 type _usecase struct {
-	logger *logger.Logger
-	db     DbRepository
+	db DbRepository
 }
 
 func New(l *logger.Logger, db DbRepository) UseCase {
-	return &_usecase{logger: l, db: db}
+	log = l
+	return &_usecase{db: db}
 }
 
-func (uc *_usecase) GetBeatmapBySetId(setId int) (*entity.Beatmap, error) {
-	bm, err := uc.db.GetBeatmapBySetId(setId)
+func (uc *_usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsDto, error) {
+	bm, err := uc.db.GetBeatmapsBySetId(setId)
 	if err != nil {
-		uc.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
-	return bm, nil
+	return &entity.BeatmapsDto{Result: bm}, nil
 }
