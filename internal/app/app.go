@@ -3,8 +3,8 @@ package app
 import (
 	"maps-house/config"
 	"maps-house/internal/controller/http"
-	repo "maps-house/internal/repository/db"
 	"maps-house/internal/usecase"
+	repo "maps-house/internal/usecase/repository/db"
 	"maps-house/pkg/logger"
 
 	"github.com/fasthttp/router"
@@ -16,9 +16,9 @@ import (
 const listenAdress = ":8000"
 
 func Run(conf *config.Config, log *logger.Logger) {
+
 	// Build DSN string (probably could an another better way)
 	dsn := conf.DSNBuilder()
-	log.Info("test")
 	// Initiailize db
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
