@@ -7,20 +7,24 @@ import (
 
 var log *logger.Logger
 
-type _usecase struct {
+type usecase struct {
 	db DbRepository
 }
 
-func New(l *logger.Logger, db DbRepository) UseCase {
+func New(l *logger.Logger, db DbRepository) *usecase {
 	log = l
-	return &_usecase{db: db}
+	return &usecase{db: db}
 }
 
-func (uc *_usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsDto, error) {
+func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsDto, error) {
 	bm, err := uc.db.GetBeatmapsBySetId(setId)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
 	return &entity.BeatmapsDto{Result: bm}, nil
+}
+
+func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
+	return nil, nil
 }

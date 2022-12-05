@@ -18,3 +18,10 @@ type Beatmap struct {
 	CS           float64
 }
 
+type BeatmapFile struct {
+	Body []byte
+}
+
+type BeatmapsDto struct {
+	Result *BeatmapMeta
+}
