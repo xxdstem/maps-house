@@ -1,8 +1,6 @@
-package api
+package beatmaps
 
 import (
-	"maps-house/internal/entity"
-
 	"github.com/fasthttp/router"
 )
 
@@ -11,5 +9,4 @@ type Handler interface {
 }
 
 type UseCase interface {
-	GetBeatmapBySetId(setId int) (*entity.BeatmapsDto, error)
 }

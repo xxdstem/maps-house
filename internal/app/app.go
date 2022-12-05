@@ -5,6 +5,7 @@ import (
 	"maps-house/internal/controller/http"
 	"maps-house/internal/usecase"
 	repo "maps-house/internal/usecase/repository/db"
+	"maps-house/pkg/customrouter"
 	"maps-house/pkg/logger"
 
 	"github.com/fasthttp/router"
@@ -26,6 +27,10 @@ func Run(conf *config.Config, log *logger.Logger) {
 	}
 	// Initialize Router
 	r := router.New()
+
+	// Initialize custom router
+	customRouter := customrouter.NewRouter(r)
+
 	r.GET("/", func(ctx *fasthttp.RequestCtx) {
 		ctx.WriteString("index.")
 	})
@@ -38,7 +43,7 @@ func Run(conf *config.Config, log *logger.Logger) {
 	// Initialize controllers
 	http.NewApiRouter(r, log, useCase)
 	log.Info("Listening app on ", listenAdress)
-	err = fasthttp.ListenAndServe(listenAdress, r.Handler)
+	err = fasthttp.ListenAndServe(listenAdress, customRouter.Handler)
 	if err != nil {
 		log.Fatal(err)
 	}

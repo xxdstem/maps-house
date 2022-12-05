@@ -18,6 +18,3 @@ type Beatmap struct {
 	CS           float64
 }
 
-type BeatmapsDto struct {
-	Result *BeatmapMeta
-}

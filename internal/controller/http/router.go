@@ -9,6 +9,6 @@ import (
 )
 
 func NewApiRouter(r *router.Router, l *logger.Logger, uc usecase.UseCase) {
-	apiHandler := api.New(l, uc)
+	apiHandler := api.New(uc, l)
 	apiHandler.Register(r)
 }

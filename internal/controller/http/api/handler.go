@@ -1,7 +1,6 @@
 package api
 
 import (
-	"maps-house/internal/usecase"
 	"maps-house/pkg/logger"
 	"strconv"
 
@@ -17,10 +16,10 @@ const (
 var log *logger.Logger
 
 type handler struct {
-	uc usecase.UseCase
+	uc UseCase
 }
 
-func New(l *logger.Logger, uc usecase.UseCase) Handler {
+func New(uc UseCase, l *logger.Logger) Handler {
 	log = l
 	return &handler{uc: uc}
 }
