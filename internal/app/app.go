@@ -1,11 +1,11 @@
 package app
 
 import (
-	"mapsHouse/config"
-	"mapsHouse/internal/controller/http"
-	repo "mapsHouse/internal/repository/db"
-	"mapsHouse/internal/usecase"
-	"mapsHouse/pkg/logger"
+	"maps-house/config"
+	"maps-house/internal/controller/http"
+	repo "maps-house/internal/repository/db"
+	"maps-house/internal/usecase"
+	"maps-house/pkg/logger"
 
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"

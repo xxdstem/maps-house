@@ -1,9 +1,9 @@
 package http
 
 import (
-	"mapsHouse/internal/controller/http/api"
-	"mapsHouse/internal/usecase"
-	"mapsHouse/pkg/logger"
+	"maps-house/internal/controller/http/api"
+	"maps-house/internal/usecase"
+	"maps-house/pkg/logger"
 
 	"github.com/fasthttp/router"
 )

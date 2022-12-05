@@ -1,7 +1,7 @@
 package db
 
 import (
-	"mapsHouse/internal/entity"
+	"maps-house/internal/entity"
 )
 
 type Repository interface {

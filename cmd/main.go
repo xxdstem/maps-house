@@ -1,9 +1,9 @@
 package main
 
 import (
-	"mapsHouse/config"
-	"mapsHouse/internal/app"
-	"mapsHouse/pkg/logger"
+	"maps-house/config"
+	"maps-house/internal/app"
+	"maps-house/pkg/logger"
 )
 
 func main() {

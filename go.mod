@@ -1,4 +1,4 @@
-module mapsHouse
+module maps-house
 
 go 1.18
 

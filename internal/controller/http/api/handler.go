@@ -1,8 +1,8 @@
 package api
 
 import (
-	"mapsHouse/internal/usecase"
-	"mapsHouse/pkg/logger"
+	"maps-house/internal/usecase"
+	"maps-house/pkg/logger"
 	"strconv"
 
 	"github.com/bytedance/sonic"

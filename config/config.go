@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"mapsHouse/pkg/logger"
+	"maps-house/pkg/logger"
 	"os"
 	"strings"
 

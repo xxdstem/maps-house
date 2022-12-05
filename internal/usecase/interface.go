@@ -1,6 +1,6 @@
 package usecase
 
-import "mapsHouse/internal/entity"
+import "maps-house/internal/entity"
 
 type UseCase interface {
 	GetBeatmapBySetId(setId int) (*entity.Beatmap, error)

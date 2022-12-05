@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"mapsHouse/internal/entity"
-	"mapsHouse/pkg/logger"
+	"maps-house/internal/entity"
+	"maps-house/pkg/logger"
 )
 
 type _usecase struct {
