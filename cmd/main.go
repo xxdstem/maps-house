@@ -13,7 +13,7 @@ func main() {
 	conf, err := config.NewConfig(log)
 
 	if err != nil {
-		log.Fatal("Config error: %s", err)
+		log.Fatal("Config error: ", err)
 	}
 
 	// Run

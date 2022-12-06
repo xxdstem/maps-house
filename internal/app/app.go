@@ -39,7 +39,9 @@ func Run(conf *config.Config, log *logger.Logger) {
 	useCase := usecase.New(log, repo, conf.Dirs.PriorityDir, conf.Dirs.MainDir)
 
 	// Initialize controllers
-	http.NewApiRouter(r, log, useCase)
+	http.RegisterMain(r, log, useCase)
+	http.RegisterApi(r, log, useCase)
+
 	log.Info("Listening app on ", conf.ListenAddress)
 	err = fasthttp.ListenAndServe(conf.ListenAddress, customRouter.Handler)
 	if err != nil {

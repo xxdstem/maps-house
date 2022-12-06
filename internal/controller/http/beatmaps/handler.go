@@ -33,6 +33,13 @@ func (h *handler) DownloadMap(ctx *fasthttp.RequestCtx) {
 	if err := h.uc.CheckBeatmapAvailability(setId); err != nil {
 		ctx.WriteString(err.Error())
 		return
+	} else {
+		beatmap, err := h.uc.DownloadMap(setId)
+		if err != nil {
+			ctx.WriteString(err.Error())
+		}
+		log.Info(beatmap)
+		ctx.WriteString("naice")
 	}
-	
+
 }

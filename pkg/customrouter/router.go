@@ -28,7 +28,7 @@ func (c myRouter) Handler(ctx *fasthttp.RequestCtx) {
 	header.Set("Access-Control-Allow-Origin", "*")
 	header.Set("Content-Type", "application/json")
 	c.r.Handler(ctx)
-	fmt.Printf("> Request end - time took: %s", time.Since(begin).String())
+	fmt.Printf("> Request end - time took: %s\n", time.Since(begin).String())
 }
 
 func NewRouter(r *router.Router) *myRouter {

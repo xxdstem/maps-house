@@ -7,13 +7,13 @@ import (
 	"maps-house/pkg/logger"
 	"os"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
 	ListenAddress string
-	Host          string
 	SecretKey     string
 	Workers       int
 	Dirs          dirs
@@ -79,6 +79,8 @@ func NewConfig(logger *logger.Logger) (*Config, error) {
 				logger.Error("Can't write bytes into config.yml")
 				return nil, err
 			}
+			time.Sleep(1 * time.Second)
+			os.Exit(0)
 		}
 	case err != nil:
 		{

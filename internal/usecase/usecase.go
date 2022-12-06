@@ -2,14 +2,12 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
 	"os"
 	"path/filepath"
+	"strconv"
 )
-
-var log *logger.Logger
 
 type usecase struct {
 	db    DbRepository
@@ -20,6 +18,14 @@ type paths struct {
 	PriorityDir string
 	MainDir     string
 }
+
+var log *logger.Logger
+
+// errors
+var (
+	ERROR_NOT_FOUND_DB = errors.New("not found in db?")
+	ERROR_NOT_FOUND    = errors.New("not found")
+)
 
 func New(l *logger.Logger, db DbRepository, prior string, main string) *usecase {
 	log = l
@@ -41,15 +47,22 @@ func (uc *usecase) CheckBeatmapAvailability(setId int) error {
 		return err
 	}
 	if bm == nil {
-		return errors.New("beatmap not found in db?")
+		return ERROR_NOT_FOUND_DB
 	}
-	filePath := filepath.Join(uc.paths.PriorityDir, string(setId), fmt.Sprintf("%d/map.osz", setId))
+	filePath := filepath.Join(uc.paths.PriorityDir, strconv.Itoa(setId), "map.osz")
 	if _, err = os.Stat(filePath); err == nil {
 		return nil
 	}
-
+	return ERROR_NOT_FOUND
 }
 
 func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
+	// Downloading map
+
+	//then
+	return uc.ServeBeatmap(setId)
+}
+
+func (uc *usecase) ServeBeatmap(setId int) (*entity.BeatmapFile, error) {
 	return nil, nil
 }
