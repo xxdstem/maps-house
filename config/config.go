@@ -14,6 +14,7 @@ import (
 
 type Config struct {
 	ListenAddress string
+	OsuApiKey     string
 	SecretKey     string
 	Workers       int
 	Dirs          dirs
