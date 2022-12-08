@@ -1,8 +1,8 @@
 package osuapi
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/bytedance/sonic"
 	"io/ioutil"
 	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
@@ -43,9 +43,7 @@ func (s *service) GetBeatmapData(setId int) ([]entity.BeatmapDTO, error) {
 		log.Error("ioutil err", err.Error())
 		return nil, err
 	}
-	log.Info("fixing shit!")
-	//body = jsonhelper.FixJsonNewLines(body)
-	err = json.Unmarshal(body, &result)
+	err = sonic.Unmarshal(body, &result)
 	if err != nil {
 		log.Error(err.Error())
 		return nil, err
