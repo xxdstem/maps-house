@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"maps-house/internal/entity"
+	"maps-house/pkg/logger"
 	"net/http"
 )
 
@@ -14,10 +15,11 @@ type Service interface {
 
 // Probably we need here something?
 type service struct {
+	log *logger.Logger
 }
 
-func NewService() Service {
-	return &service{}
+func NewService(log *logger.Logger) Service {
+	return &service{log: log}
 }
 
 func (s *service) GetBeatmapData(setId int) (*entity.BeatmapDTO, error) {

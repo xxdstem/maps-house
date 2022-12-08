@@ -3,6 +3,8 @@ package app
 import (
 	"maps-house/config"
 	"maps-house/internal/controller/http"
+	"maps-house/internal/services/beatmaps"
+	"maps-house/internal/services/osuapi"
 	"maps-house/internal/usecase"
 	repo "maps-house/internal/usecase/repository/db"
 	"maps-house/pkg/customrouter"
@@ -30,13 +32,17 @@ func Run(conf *config.Config, log *logger.Logger) {
 	customRouter := customrouter.NewRouter(r)
 
 	r.GET("/", func(ctx *fasthttp.RequestCtx) {
-		ctx.WriteString("index.")
+		_, _ = ctx.WriteString("index.")
 	})
 	// Initialize repos
-	repo := repo.New(db)
+	dbRepo := repo.New(db)
 
-	// Initialize usecases
-	useCase := usecase.New(log, repo, conf.Dirs.PriorityDir, conf.Dirs.MainDir)
+	// Initialize services
+	osuApiService := osuapi.NewService(log)
+	beatmapsService := beatmaps.NewService(log, dbRepo, conf.Dirs.PriorityDir, conf.Dirs.MainDir)
+
+	// Initialize useCases
+	useCase := usecase.New(log, dbRepo, osuApiService, beatmapsService)
 
 	// Initialize controllers
 	http.RegisterMain(r, log, useCase)

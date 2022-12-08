@@ -2,6 +2,10 @@ package usecase
 
 import "maps-house/internal/entity"
 
-type DbRepository interface {
-	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
+type BeatmapsService interface {
+	CheckBeatmapAvailability(setId int) error
+}
+
+type OsuApiService interface {
+	GetBeatmapData(setId int) (*entity.BeatmapDTO, error)
 }
