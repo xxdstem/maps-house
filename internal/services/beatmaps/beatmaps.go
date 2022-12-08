@@ -13,11 +13,12 @@ type Service interface {
 }
 
 type service struct {
-	log          *logger.Logger
 	db           DbRepository
 	PriorityPath string
 	MainPath     string
 }
+
+var log *logger.Logger
 
 // errors
 var (
@@ -25,8 +26,9 @@ var (
 	ErrorNotFoundFile = errors.New("not found file")
 )
 
-func NewService(log *logger.Logger, db DbRepository, prior string, main string) Service {
-	return &service{log: log, db: db, PriorityPath: prior, MainPath: main}
+func NewService(l *logger.Logger, db DbRepository, prior string, main string) Service {
+	log = l
+	return &service{db: db, PriorityPath: prior, MainPath: main}
 }
 
 func (service *service) CheckBeatmapAvailability(setId int) error {
