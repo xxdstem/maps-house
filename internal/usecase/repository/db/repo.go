@@ -3,14 +3,7 @@ package db
 import (
 	"maps-house/internal/entity"
 
-	"errors"
-
 	"gorm.io/gorm"
-)
-
-// errors
-var (
-	ERROR_NOT_FOUND = errors.New("not found")
 )
 
 type repo struct {
@@ -24,7 +17,7 @@ func New(db *gorm.DB) Repository {
 func (r *repo) GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error) {
 
 	var result *entity.BeatmapMeta
-	err := r.db.Model(&entity.BeatmapMeta{}).Preload("Beatmaps").Where(&entity.BeatmapMeta{BeatmapsetId: setId}).Find(&result).Error
+	err := r.db.Model(&entity.BeatmapMeta{}).Preload("Beatmaps").Where(&entity.BeatmapMeta{BeatmapSetId: setId}).Find(&result).Error
 	if err != nil {
 		return nil, err
 	}
