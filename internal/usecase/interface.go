@@ -7,5 +7,5 @@ type BeatmapsService interface {
 }
 
 type OsuApiService interface {
-	GetBeatmapData(setId int) (*entity.BeatmapDTO, error)
+	GetBeatmapData(setId int) ([]entity.BeatmapDTO, error)
 }

@@ -31,7 +31,8 @@ func (h *handler) DownloadMap(ctx *fasthttp.RequestCtx) {
 	setIdstr := ctx.UserValue("ID").(string)
 	setId, _ := strconv.Atoi(setIdstr)
 	if err := h.uc.CheckBeatmapAvailability(setId); err != nil {
-		ctx.WriteString(err.Error())
+		err = h.uc.CacheMapFromBancho(setId)
+		ctx.WriteString("gud")
 		return
 	} else {
 		beatmap, err := h.uc.DownloadMap(setId)

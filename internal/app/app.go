@@ -7,7 +7,6 @@ import (
 	"maps-house/internal/services/osuapi"
 	"maps-house/internal/usecase"
 	repo "maps-house/internal/usecase/repository/db"
-	"maps-house/pkg/customrouter"
 	"maps-house/pkg/logger"
 
 	"github.com/fasthttp/router"
@@ -29,7 +28,7 @@ func Run(conf *config.Config, log *logger.Logger) {
 	r := router.New()
 
 	// Initialize custom router
-	customRouter := customrouter.NewRouter(r)
+	//customRouter := customrouter.NewRouter(r)
 
 	r.GET("/", func(ctx *fasthttp.RequestCtx) {
 		_, _ = ctx.WriteString("index.")
@@ -49,7 +48,7 @@ func Run(conf *config.Config, log *logger.Logger) {
 	http.RegisterApi(r, log, useCase)
 
 	log.Info("Listening app on ", conf.ListenAddress)
-	err = fasthttp.ListenAndServe(conf.ListenAddress, customRouter.Handler)
+	err = fasthttp.ListenAndServe(conf.ListenAddress, r.Handler)
 	if err != nil {
 		log.Fatal(err)
 	}

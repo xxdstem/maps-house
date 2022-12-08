@@ -40,7 +40,6 @@ func (h *handler) GetBeatmap(ctx *fasthttp.RequestCtx) {
 	rawBytes, err := sonic.Marshal(result)
 	if err != nil {
 		log.Error(err)
-		ctx.WriteString(err.Error())
 		return
 	}
 	ctx.Write(rawBytes)

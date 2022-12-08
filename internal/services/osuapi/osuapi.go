@@ -1,8 +1,8 @@
 package osuapi
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/bytedance/sonic"
 	"io/ioutil"
 	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
@@ -10,7 +10,7 @@ import (
 )
 
 type Service interface {
-	GetBeatmapData(setId int) (*entity.BeatmapDTO, error)
+	GetBeatmapData(setId int) ([]entity.BeatmapDTO, error)
 }
 
 // Probably we need here something?
@@ -31,19 +31,24 @@ func NewService(l *logger.Logger, apikey string) Service {
 	return &service{}
 }
 
-func (s *service) GetBeatmapData(setId int) (*entity.BeatmapDTO, error) {
-	var result entity.BeatmapDTO
-
-	resp, err := http.Get(fmt.Sprintf(ApiGetBeatmaps+apiKey, setId))
+func (s *service) GetBeatmapData(setId int) ([]entity.BeatmapDTO, error) {
+	var result []entity.BeatmapDTO
+	var finalUrl string = fmt.Sprintf(ApiGetBeatmaps+apiKey, setId)
+	resp, err := http.Get(finalUrl)
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
-	//We Read the response body on the line below.
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Error(err)
+		log.Error("ioutil err", err.Error())
+		return nil, err
 	}
-	err = sonic.Unmarshal(body, &result)
-
-	return &result, err
+	log.Info("fixing shit!")
+	//body = jsonhelper.FixJsonNewLines(body)
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	return result, err
 }

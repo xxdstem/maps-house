@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"github.com/bytedance/sonic"
 	"maps-house/internal/entity"
 	"maps-house/internal/services/beatmaps"
 	"maps-house/pkg/logger"
@@ -30,6 +31,14 @@ func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsResult, error) 
 
 func (uc *usecase) CheckBeatmapAvailability(setId int) error {
 	return uc.beatmapsService.CheckBeatmapAvailability(setId)
+}
+
+func (uc *usecase) CacheMapFromBancho(setId int) error {
+	a, err := uc.osuApiService.GetBeatmapData(setId)
+	if _, err := sonic.Marshal(a); err == nil {
+		return nil
+	}
+	return err
 }
 
 func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
