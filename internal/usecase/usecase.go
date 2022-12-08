@@ -32,13 +32,13 @@ func New(l *logger.Logger, db DbRepository, prior string, main string) *usecase 
 	return &usecase{db: db, paths: paths{PriorityDir: prior, MainDir: main}}
 }
 
-func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsDto, error) {
+func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsResult, error) {
 	bm, err := uc.db.GetBeatmapsBySetId(setId)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	return &entity.BeatmapsDto{Result: bm}, nil
+	return &entity.BeatmapsResult{Result: bm}, nil
 }
 
 func (uc *usecase) CheckBeatmapAvailability(setId int) error {
@@ -58,6 +58,8 @@ func (uc *usecase) CheckBeatmapAvailability(setId int) error {
 
 func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 	// Downloading map
+
+	// Пишу пока всё здесь, потом разбросаю код
 
 	//then
 	return uc.ServeBeatmap(setId)
