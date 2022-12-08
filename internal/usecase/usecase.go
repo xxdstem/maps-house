@@ -51,5 +51,6 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 }
 
 func (uc *usecase) ServeBeatmap(setId int) (*entity.BeatmapFile, error) {
+	log.Info(setId)
 	return nil, nil
 }
