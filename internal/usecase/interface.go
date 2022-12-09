@@ -9,3 +9,8 @@ type BeatmapsService interface {
 type OsuApiService interface {
 	GetBeatmapData(setId int) ([]entity.BeatmapDTO, error)
 }
+
+type DbRepository interface {
+	InsertBeatmapSet(meta *entity.BeatmapMeta) error
+	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
+}

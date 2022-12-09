@@ -2,19 +2,19 @@ package usecase
 
 import (
 	"maps-house/internal/entity"
-	"maps-house/internal/services/beatmaps"
 	"maps-house/pkg/logger"
+	"time"
 )
 
 type usecase struct {
 	osuApiService   OsuApiService
 	beatmapsService BeatmapsService
-	db              beatmaps.DbRepository
+	db              DbRepository
 }
 
 var log *logger.Logger
 
-func New(l *logger.Logger, db beatmaps.DbRepository, osuApi OsuApiService, beatmaps BeatmapsService) *usecase {
+func New(l *logger.Logger, db DbRepository, osuApi OsuApiService, beatmaps BeatmapsService) *usecase {
 	log = l
 	return &usecase{db: db, osuApiService: osuApi, beatmapsService: beatmaps}
 }
@@ -33,16 +33,49 @@ func (uc *usecase) CheckBeatmapAvailability(setId int) error {
 }
 
 func (uc *usecase) CacheMapFromBancho(setId int) error {
-	a, err := uc.osuApiService.GetBeatmapData(setId)
+	maps, err := uc.osuApiService.GetBeatmapData(setId)
 	if err != nil {
 		return err
 	}
-	var b entity.BeatmapDTO = a[0]
+	var firstBeatmap entity.BeatmapDTO = maps[0]
+	var curTime time.Time = time.Now()
 	meta := entity.BeatmapMeta{
-		SetID:  b.SetID,
-		Artist: b.Artist,
-		Title:  a[0].Title,
+		ID:         firstBeatmap.SetID,
+		Artist:     firstBeatmap.Artist,
+		Title:      firstBeatmap.Title,
+		Creator:    firstBeatmap.Creator,
+		Tags:       firstBeatmap.Tags,
+		Length:     firstBeatmap.Length,
+		BPM:        firstBeatmap.BPM,
+		LanguageID: firstBeatmap.LanguageID,
+		GenreID:    firstBeatmap.GenreID,
+		Downloaded: false,
+		Beatmaps:   []*entity.Beatmap{},
 	}
+	for i := range maps {
+		var beatmapDto entity.BeatmapDTO = maps[i]
+		t, err := time.Parse("2006-01-02 15:04:05", beatmapDto.LastUpdate)
+		if err != nil {
+			return err
+		}
+		beatmap := &entity.Beatmap{
+			ID:         beatmapDto.ID,
+			SetID:      beatmapDto.SetID,
+			MD5:        beatmapDto.MD5,
+			Version:    beatmapDto.Version,
+			HitLength:  beatmapDto.HitLength,
+			Ranked:     beatmapDto.Ranked,
+			LastUpdate: t.Unix(),
+			ApiUpdate:  curTime.Unix(),
+			AR:         beatmapDto.AR,
+			OD:         beatmapDto.OD,
+			HP:         beatmapDto.HP,
+			CS:         beatmapDto.CS,
+		}
+		meta.Beatmaps = append(meta.Beatmaps, beatmap)
+	}
+	err = uc.db.InsertBeatmapSet(&meta)
+
 	return err
 }
 
