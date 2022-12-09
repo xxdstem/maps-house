@@ -12,6 +12,4 @@ type Handler interface {
 
 type UseCase interface {
 	DownloadMap(setId int) (*entity.BeatmapFile, error)
-	CheckBeatmapAvailability(setId int) error
-	CacheMapFromBancho(setId int) error
 }

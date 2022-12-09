@@ -28,10 +28,6 @@ func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsResultDTO, erro
 	return &entity.BeatmapsResultDTO{Result: bm}, nil
 }
 
-func (uc *usecase) CheckBeatmapAvailability(setId int) error {
-	return uc.beatmapsService.CheckBeatmapAvailability(setId)
-}
-
 func (uc *usecase) CacheMapFromBancho(setId int) error {
 	maps, err := uc.osuApiService.GetBeatmapData(setId)
 	if err != nil {
@@ -83,7 +79,16 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 	// Downloading map
 
 	// Пишу пока всё здесь, потом разбросаю код
-
+	if err := uc.beatmapsService.CheckBeatmapAvailability(setId); err != nil {
+		err = uc.CacheMapFromBancho(setId)
+		return nil, err
+	} else {
+		beatmap, err := uc.DownloadMap(setId)
+		if err != nil {
+			return nil, err
+		}
+		log.Info(beatmap)
+	}
 	//then
 	return uc.ServeBeatmap(setId)
 }
