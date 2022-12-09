@@ -1,6 +1,10 @@
 package app
 
 import (
+	"github.com/fasthttp/router"
+	"github.com/valyala/fasthttp"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"maps-house/config"
 	"maps-house/internal/controller/http"
 	"maps-house/internal/services/beatmaps"
@@ -8,18 +12,14 @@ import (
 	"maps-house/internal/usecase"
 	repo "maps-house/internal/usecase/repository/db"
 	"maps-house/pkg/logger"
-
-	"github.com/fasthttp/router"
-	"github.com/valyala/fasthttp"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 func Run(conf *config.Config, log *logger.Logger) {
 
-	// Build DSN string (probably could an another better way)
+	// Build DSN string (probably could a better way)
 	dsn := conf.DSNBuilder()
-	// Initiailize db
+
+	// Initialize db
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
 		log.Fatal("Gorm error: %s", err)
