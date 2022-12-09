@@ -21,7 +21,3 @@ type Beatmap struct {
 type BeatmapFile struct {
 	Body []byte
 }
-
-type BeatmapsResult struct {
-	Result *BeatmapMeta `json:"result"`
-}

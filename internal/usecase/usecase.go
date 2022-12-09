@@ -20,13 +20,13 @@ func New(l *logger.Logger, db beatmaps.DbRepository, osuApi OsuApiService, beatm
 	return &usecase{db: db, osuApiService: osuApi, beatmapsService: beatmaps}
 }
 
-func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsResult, error) {
+func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsResultDTO, error) {
 	bm, err := uc.db.GetBeatmapsBySetId(setId)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	return &entity.BeatmapsResult{Result: bm}, nil
+	return &entity.BeatmapsResultDTO{Result: bm}, nil
 }
 
 func (uc *usecase) CheckBeatmapAvailability(setId int) error {

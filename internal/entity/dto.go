@@ -27,3 +27,7 @@ type BeatmapDTO struct {
 	MaxCombo string `json:"max_combo" gorm:"column:max_combo"`
 	Mode     string `json:"mode"`
 }
+
+type BeatmapsResultDTO struct {
+	Result *BeatmapMeta `json:"result"`
+}

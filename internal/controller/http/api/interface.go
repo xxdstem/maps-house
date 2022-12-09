@@ -11,5 +11,5 @@ type Handler interface {
 }
 
 type UseCase interface {
-	GetBeatmapBySetId(setId int) (*entity.BeatmapsResult, error)
+	GetBeatmapBySetId(setId int) (*entity.BeatmapsResultDTO, error)
 }
