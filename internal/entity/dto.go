@@ -14,18 +14,20 @@ type BeatmapMetaDTO struct {
 }
 
 type BeatmapDTO struct {
-	ID       string `json:"beatmap_id" gorm:"column:beatmap_id"`
-	SetID    string `json:"beatmapset_id" gorm:"column:beatmapset_id"`
-	MD5      string `json:"file_md5" gorm:"column:file_md5"`
-	Version  string `json:"version"`
-	AR       string `json:"diff_approach"`
-	OD       string `json:"diff_overall"`
-	CS       string `json:"diff_size"`
-	HP       string `json:"diff_drain"`
-	Length   string `json:"hit_length" gorm:"column:hit_length"`
-	Ranked   string `json:"approved" gorm:"column:ranked"`
-	MaxCombo string `json:"max_combo" gorm:"column:max_combo"`
-	Mode     string `json:"mode"`
+	ID       int     `json:"beatmap_id,string" gorm:"column:beatmap_id"`
+	SetID    int     `json:"beatmapset_id,string" gorm:"column:beatmapset_id"`
+	Artist   string  `json:"artist"`
+	Title    string  `json:"title"`
+	MD5      string  `json:"file_md5" gorm:"column:file_md5"`
+	Version  string  `json:"version"`
+	AR       float64 `json:"diff_approach,string"`
+	OD       float64 `json:"diff_overall,string"`
+	CS       float64 `json:"diff_size,string"`
+	HP       float64 `json:"diff_drain,string"`
+	Length   int     `json:"hit_length,string" gorm:"column:hit_length"`
+	Ranked   int8    `json:"approved,string" gorm:"column:ranked"`
+	MaxCombo int     `json:"max_combo,string" gorm:"column:max_combo"`
+	Mode     int8    `json:"mode,string"`
 }
 
 type BeatmapsResultDTO struct {

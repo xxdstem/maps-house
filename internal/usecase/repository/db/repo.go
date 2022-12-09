@@ -24,9 +24,13 @@ func New(db *gorm.DB) Repository {
 func (r *repo) GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error) {
 
 	var result *entity.BeatmapMeta
-	err := r.db.Model(&entity.BeatmapMeta{}).Preload("Beatmaps").Where(&entity.BeatmapMeta{BeatmapsetId: setId}).Find(&result).Error
+	err := r.db.Model(&entity.BeatmapMeta{}).Preload("Beatmaps").Where(&entity.BeatmapMeta{SetID: setId}).Find(&result).Error
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
+}
+
+func (r *repo) InsertBeatmapSet(meta *entity.BeatmapMeta) error {
+	return nil
 }
