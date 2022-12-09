@@ -5,6 +5,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	gLogger "gorm.io/gorm/logger"
 	"maps-house/config"
 	"maps-house/internal/controller/http"
 	"maps-house/internal/services/beatmaps"
@@ -20,7 +21,10 @@ func Run(conf *config.Config, log *logger.Logger) {
 	dsn := conf.DSNBuilder()
 
 	// Initialize db
-	db, err := gorm.Open(mysql.Open(dsn))
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: gLogger.Default.LogMode(gLogger.Silent),
+	})
+
 	if err != nil {
 		log.Fatal("Gorm error: %s", err)
 	}
