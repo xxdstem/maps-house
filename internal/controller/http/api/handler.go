@@ -1,6 +1,7 @@
 package api
 
 import (
+	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
 	"strconv"
 
@@ -13,11 +14,19 @@ const (
 	beatmapGet = "/api/beatmap/{ID}"
 )
 
-var log *logger.Logger
+type Handler interface {
+	Register(router *router.Router)
+}
+
+type UseCase interface {
+	GetBeatmapBySetId(setId int) (*entity.BeatmapsResultDTO, error)
+}
 
 type handler struct {
 	uc UseCase
 }
+
+var log *logger.Logger
 
 func New(uc UseCase, l *logger.Logger) Handler {
 	log = l

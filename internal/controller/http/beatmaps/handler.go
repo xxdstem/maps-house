@@ -1,6 +1,7 @@
 package beatmaps
 
 import (
+	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
 	"strconv"
 
@@ -12,11 +13,19 @@ const (
 	downloadRoute = "/d/{ID}"
 )
 
-var log *logger.Logger
+type Handler interface {
+	Register(router *router.Router)
+}
+
+type UseCase interface {
+	DownloadMap(setId int) (*entity.BeatmapFile, error)
+}
 
 type handler struct {
 	uc UseCase
 }
+
+var log *logger.Logger
 
 func New(uc UseCase, l *logger.Logger) Handler {
 	log = l

@@ -2,14 +2,25 @@ package beatmaps
 
 import (
 	"errors"
+	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
 	"os"
 	"path/filepath"
 	"strconv"
 )
 
+// errors
+var (
+	ErrorNotFoundDb   = errors.New("not found in db")
+	ErrorNotFoundFile = errors.New("not found file")
+)
+
 type Service interface {
 	CheckBeatmapAvailability(setId int) error
+}
+
+type DbRepository interface {
+	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
 }
 
 type service struct {
@@ -19,12 +30,6 @@ type service struct {
 }
 
 var log *logger.Logger
-
-// errors
-var (
-	ErrorNotFoundDb   = errors.New("not found in db")
-	ErrorNotFoundFile = errors.New("not found file")
-)
 
 func NewService(l *logger.Logger, db DbRepository, prior string, main string) Service {
 	log = l
