@@ -4,6 +4,7 @@ import (
 	"maps-house/config"
 	"maps-house/internal/app"
 	"maps-house/pkg/logger"
+	"os"
 )
 
 func main() {
@@ -14,6 +15,7 @@ func main() {
 
 	if err != nil {
 		log.Fatal("Config error: ", err)
+		os.Exit(-1)
 	}
 
 	// Run

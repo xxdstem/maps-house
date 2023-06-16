@@ -6,6 +6,21 @@ import (
 	"time"
 )
 
+type BeatmapsService interface {
+	CheckBeatmapAvailability(setId int) error
+	SaveBeatmapFile(setId int) error
+	ServeBeatmap(setId int) ([]byte, error)
+}
+
+type OsuApiService interface {
+	GetBeatmapData(setId int) ([]entity.BeatmapDTO, error)
+}
+
+type DbRepository interface {
+	InsertBeatmapSet(meta *entity.BeatmapMeta) error
+	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
+}
+
 type usecase struct {
 	osuApiService   OsuApiService
 	beatmapsService BeatmapsService
@@ -28,7 +43,7 @@ func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsResultDTO, erro
 	return &entity.BeatmapsResultDTO{Result: bm}, nil
 }
 
-func (uc *usecase) CacheMapFromBancho(setId int) error {
+func (uc *usecase) SaveMapMeta(setId int) error {
 	maps, err := uc.osuApiService.GetBeatmapData(setId)
 	if err != nil {
 		return err
@@ -80,20 +95,23 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 
 	// Пишу пока всё здесь, потом разбросаю код
 	if err := uc.beatmapsService.CheckBeatmapAvailability(setId); err != nil {
-		err = uc.CacheMapFromBancho(setId)
-		return nil, err
-	} else {
-		beatmap, err := uc.DownloadMap(setId)
+		err = uc.SaveMapMeta(setId)
 		if err != nil {
 			return nil, err
 		}
-		log.Info(beatmap)
+		err = uc.beatmapsService.SaveBeatmapFile(setId)
+		if err != nil {
+			return nil, err
+		}
 	}
 	//then
 	return uc.ServeBeatmap(setId)
 }
 
 func (uc *usecase) ServeBeatmap(setId int) (*entity.BeatmapFile, error) {
-	log.Info(setId)
-	return nil, nil
+	body, err := uc.beatmapsService.ServeBeatmap(setId)
+	if err != nil {
+		return nil, err
+	}
+	return &entity.BeatmapFile{Body: body}, nil
 }

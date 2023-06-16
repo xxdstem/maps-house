@@ -39,11 +39,12 @@ func (h *handler) Register(router *router.Router) {
 func (h *handler) DownloadMap(ctx *fasthttp.RequestCtx) {
 	setIdstr := ctx.UserValue("ID").(string)
 	setId, _ := strconv.Atoi(setIdstr)
-	_, err := h.uc.DownloadMap(setId)
+	beatmapFile, err := h.uc.DownloadMap(setId)
 	if err != nil {
 		ctx.WriteString(err.Error())
 		return
 	}
-	ctx.WriteString("we guds.")
+
+	ctx.Write(beatmapFile.Body)
 
 }

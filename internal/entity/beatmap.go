@@ -1,4 +1,4 @@
-package entity
+ package entity
 
 type BeatmapMeta struct {
 	ID         int        `json:"id" gorm:"column:beatmapset_id"`

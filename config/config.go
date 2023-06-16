@@ -1,15 +1,10 @@
 package config
 
 import (
-	"errors"
-	"fmt"
-	"io"
 	"maps-house/pkg/logger"
-	"os"
 	"strings"
-	"time"
 
-	"gopkg.in/yaml.v3"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -18,23 +13,17 @@ type Config struct {
 	SecretKey     string
 	Workers       int
 	Dirs          dirs
-	DB            db
+	DB_Host       string `mapstructure:"POSTGRES_HOST"`
+	DB_Name       string `mapstructure:"POSTGRES_DB"`
+	DB_Port       string `mapstructure:"POSTGRES_PORT"`
+	DB_User       string `mapstructure:"POSTGRES_USER"`
+	DB_Password   string `mapstructure:"POSTGRES_PASSWORD"`
 }
 
 type dirs struct {
 	PriorityDir string
 	MainDir     string
 }
-
-type db struct {
-	Host     string
-	DBname   string
-	Port     string
-	User     string
-	Password string
-}
-
-var confFile = "./config.yml"
 
 func NewConfig(logger *logger.Logger) (*Config, error) {
 	c := Config{
@@ -44,74 +33,56 @@ func NewConfig(logger *logger.Logger) (*Config, error) {
 			PriorityDir: "./.data/priority/",
 			MainDir:     "./.data/main/",
 		},
-		DB: db{
-			Host:     "127.0.0.1",
-			DBname:   "ripple",
-			Port:     "3306",
-			User:     "",
-			Password: "",
-		},
 	}
+	viper.AddConfigPath(".")
+	viper.SetConfigType("env")
+	viper.SetConfigName("app")
 
-	f, err := os.Open(confFile)
-	switch {
-	case errors.Is(err, os.ErrNotExist):
-		{
-			logger.Warn("No config.yml was found. Creating config.yml file...")
+	viper.AutomaticEnv()
 
-			f, err = os.Create(confFile)
-			if errors.Is(err, os.ErrPermission) {
-				logger.Error("Can't create config.yml file, permission denied")
-				return nil, err
-			}
-			if err != nil {
-				logger.Error("Can't create config.yml file")
-				return nil, err
-			}
-
-			b, err := yaml.Marshal(&c)
-			if err != nil {
-				logger.Error("Can't process config.yml")
-				return nil, err
-			}
-
-			_, err = f.Write(b)
-			if err != nil {
-				logger.Error("Can't write bytes into config.yml")
-				return nil, err
-			}
-			time.Sleep(1 * time.Second)
-			os.Exit(0)
-		}
-	case err != nil:
-		{
-			logger.Error(fmt.Sprintf("config.yml error: %v", err))
-			return nil, err
-		}
-	}
-
-	b, err := io.ReadAll(f)
+	err := viper.ReadInConfig()
 	if err != nil {
-		logger.Error("Can't read config.yml")
 		return nil, err
 	}
 
-	yaml.Unmarshal(b, &c)
+	err = viper.Unmarshal(&c)
+	if err != nil {
+		return nil, err
+	}
+	viper.SafeWriteConfig()
 	return &c, nil
 }
 
 func (c *Config) DSNBuilder() string {
 	var dsn strings.Builder
+	dsn.WriteString("host=")
+	dsn.WriteString(c.DB_Host)
+	dsn.WriteString(" user=")
+	dsn.WriteString(c.DB_User)
+	dsn.WriteString(" password=")
+	dsn.WriteString(c.DB_Password)
+	dsn.WriteString(" dbname=")
+	dsn.WriteString(c.DB_Name)
+	dsn.WriteString(" port=")
+	dsn.WriteString(c.DB_Port)
 
-	dsn.WriteString(c.DB.User)
+	dsn.WriteString(" sslmode=disable TimeZone=Europe/Moscow")
+
+	return dsn.String()
+}
+
+func (c *Config) DSNMySQLBuilder() string {
+	var dsn strings.Builder
+
+	dsn.WriteString(c.DB_User)
 	dsn.WriteString(":")
-	dsn.WriteString(c.DB.Password)
+	dsn.WriteString(c.DB_Password)
 	dsn.WriteString("@(")
-	dsn.WriteString(c.DB.Host)
+	dsn.WriteString(c.DB_Host)
 	dsn.WriteString(":")
-	dsn.WriteString(c.DB.Port)
+	dsn.WriteString(c.DB_Port)
 	dsn.WriteString(")/")
-	dsn.WriteString(c.DB.DBname)
+	dsn.WriteString(c.DB_Name)
 
 	return dsn.String()
 }

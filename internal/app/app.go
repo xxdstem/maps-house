@@ -1,11 +1,6 @@
 package app
 
 import (
-	"github.com/fasthttp/router"
-	"github.com/valyala/fasthttp"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	gLogger "gorm.io/gorm/logger"
 	"maps-house/config"
 	"maps-house/internal/controller/http"
 	"maps-house/internal/services/beatmaps"
@@ -13,6 +8,12 @@ import (
 	"maps-house/internal/usecase"
 	repo "maps-house/internal/usecase/repository/db"
 	"maps-house/pkg/logger"
+
+	"github.com/fasthttp/router"
+	"github.com/valyala/fasthttp"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	gLogger "gorm.io/gorm/logger"
 )
 
 func Run(conf *config.Config, log *logger.Logger) {
@@ -21,7 +22,7 @@ func Run(conf *config.Config, log *logger.Logger) {
 	dsn := conf.DSNBuilder()
 
 	// Initialize db
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: gLogger.Default.LogMode(gLogger.Silent),
 	})
 

@@ -21,9 +21,16 @@ func (r *repo) GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(result.Beatmaps) == 0 {
+		result = nil
+	}
 	return result, nil
 }
 
 func (r *repo) InsertBeatmapSet(meta *entity.BeatmapMeta) error {
 	return r.db.Create(&meta).Error
+}
+
+func (r *repo) SetDownloadedStatus(setId int, state bool) error {
+	return r.db.Save(&entity.BeatmapMeta{ID: setId, Downloaded: state}).Error
 }
