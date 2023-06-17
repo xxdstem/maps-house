@@ -21,8 +21,8 @@ type BeatmapDTO struct {
 	Ranked     int8 `json:"approved,string" gorm:"column:ranked"`
 	MaxCombo   int  `json:"max_combo,string" gorm:"column:max_combo"`
 	Mode       int8 `json:"mode,string"`
-	LanguageID int  `json:"language_id,string"`
-	GenreID    int  `json:"genre_id,string"`
+	LanguageID int8 `json:"language_id,string"`
+	GenreID    int8 `json:"genre_id,string"`
 }
 
 type BeatmapsResultDTO struct {

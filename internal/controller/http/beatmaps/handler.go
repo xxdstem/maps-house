@@ -1,6 +1,7 @@
 package beatmaps
 
 import (
+	"fmt"
 	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
 	"strconv"
@@ -46,5 +47,8 @@ func (h *handler) DownloadMap(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.Write(beatmapFile.Body)
-
+	ctx.Response.Header.Add("Content-type", "application/octet-stream")
+	ctx.Response.Header.Add("Content-length", fmt.Sprintf("%d", len(beatmapFile.Body)))
+	ctx.Response.Header.Add("Content-Description", "File Transfer")
+	ctx.Response.Header.Add("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.osz\"", beatmapFile.Title))
 }

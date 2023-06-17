@@ -10,14 +10,14 @@ type repo struct {
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) Repository {
+func New(db *gorm.DB) *repo {
 	return &repo{db: db}
 }
 
 func (r *repo) GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error) {
 
 	var result *entity.BeatmapMeta
-	err := r.db.Model(&entity.BeatmapMeta{}).Preload("Beatmaps").Where(&entity.BeatmapMeta{ID: setId}).Find(&result).Error
+	err := r.db.Model(&entity.BeatmapMeta{}).Where(&entity.BeatmapMeta{BeatmapsetID: setId}).Find(&result).Error
 	if err != nil {
 		return nil, err
 	}
@@ -32,5 +32,6 @@ func (r *repo) InsertBeatmapSet(meta *entity.BeatmapMeta) error {
 }
 
 func (r *repo) SetDownloadedStatus(setId int, state bool) error {
-	return r.db.Save(&entity.BeatmapMeta{ID: setId, Downloaded: state}).Error
+	meta := &entity.BeatmapMeta{BeatmapsetID: setId}
+	return r.db.Model(&meta).Update("Downloaded", state).Error
 }

@@ -35,8 +35,14 @@ func init() {
 }
 
 func main() {
-	db.AutoMigrate(&entity.Beatmap{})
-	db.AutoMigrate(&entity.BeatmapMeta{})
-	log.Done("? Migration complete")
-	fmt.Println("???")
+
+	err := db.AutoMigrate(&entity.BeatmapMeta{})
+	fmt.Println(err)
+	err = db.AutoMigrate(&entity.Beatmap{})
+	fmt.Println(err)
+	// Manually add foreign key constraint
+	err = db.Exec("ALTER TABLE beatmaps ADD CONSTRAINT fk_beatmapset FOREIGN KEY (beatmapset_id) REFERENCES beatmap_meta(beatmapset_id)").Error
+	fmt.Println(err)
+
+	fmt.Println("Migration complete")
 }
