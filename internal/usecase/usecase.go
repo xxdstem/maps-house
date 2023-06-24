@@ -44,7 +44,7 @@ func (uc *usecase) GetBeatmapBySetId(setId int) (*entity.BeatmapsResultDTO, erro
 	return &entity.BeatmapsResultDTO{Result: bm}, nil
 }
 
-func (uc *usecase) SaveMapMeta(setId int) (*entity.BeatmapMeta, error) {
+func (uc *usecase) FetchBeatmapMeta(setId int) (*entity.BeatmapMeta, error) {
 	maps, err := uc.osuApiService.GetBeatmapData(setId)
 	if err != nil {
 		return nil, err
@@ -60,6 +60,7 @@ func (uc *usecase) SaveMapMeta(setId int) (*entity.BeatmapMeta, error) {
 		Length:       firstBeatmap.Length,
 		BPM:          firstBeatmap.BPM,
 		LanguageID:   firstBeatmap.LanguageID,
+		ApiUpdate:    curTime.Unix(),
 		GenreID:      firstBeatmap.GenreID,
 		Downloaded:   false,
 		Beatmaps:     []*entity.Beatmap{},
@@ -77,16 +78,16 @@ func (uc *usecase) SaveMapMeta(setId int) (*entity.BeatmapMeta, error) {
 			Version:      beatmapDto.Version,
 			HitLength:    beatmapDto.HitLength,
 			Ranked:       beatmapDto.Ranked,
-			LastUpdate:   t.Unix(),
-			ApiUpdate:    curTime.Unix(),
 			AR:           beatmapDto.AR,
 			OD:           beatmapDto.OD,
 			HP:           beatmapDto.HP,
 			CS:           beatmapDto.CS,
 		}
+		if meta.LastUpdate < t.Unix() {
+			meta.LastUpdate = t.Unix()
+		}
 		meta.Beatmaps = append(meta.Beatmaps, beatmap)
 	}
-	err = uc.db.InsertBeatmapSet(&meta)
 	return &meta, err
 }
 
@@ -95,14 +96,36 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 	var bm *entity.BeatmapMeta
 	bm, err := uc.beatmapsService.CheckBeatmapAvailability(setId)
 	if err != nil {
-		bm, err = uc.SaveMapMeta(setId)
+		log.Error("[", setId, "] Beatmap availability check not passed")
+		bm, err := uc.FetchBeatmapMeta(setId)
+		if err != nil {
+			log.Error("[", setId, "] Beatmap available, cannot fetch beatmap meta")
+			return nil, err
+		}
+		err = uc.db.InsertBeatmapSet(bm)
 		if err != nil {
 			return nil, err
 		}
 		err = uc.beatmapsService.SaveBeatmapFile(setId)
 		if err != nil {
+			log.Error("[", setId, "] Cannot save beatmap file")
 			return nil, err
 		}
+		log.Info("[", setId, "] Beatmap successfully downloaded")
+	} else if bm.Beatmaps[0].Ranked != 2 && time.Since(time.Unix(bm.ApiUpdate, 0))/24 > 3 {
+		apiData, err := uc.FetchBeatmapMeta(setId)
+		if err != nil {
+			//remove map?
+			log.Info("[", setId, "] Cannot fetch beatmap meta, gonna remove map")
+			return nil, err
+		}
+		if bm.LastUpdate < apiData.LastUpdate {
+			// re-download
+			log.Info("[", setId, "] Beatmap LastUpdate changed, re-downloading")
+			err = uc.beatmapsService.SaveBeatmapFile(setId)
+		}
+
+		// re-check if beatmap not updated
 	}
 	//then
 	return uc.ServeBeatmap(setId, bm)

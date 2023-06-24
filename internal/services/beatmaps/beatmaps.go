@@ -58,11 +58,19 @@ func (this *service) SaveBeatmapFile(setId int) error {
 
 	user := "Karanos"
 	pw := "3ab61ccb3678229a797bf4e48fb96f90"
+
 	filePath := this.setIdToPath(setId)
 	url := fmt.Sprintf("https://osu.ppy.sh/d/%dn?u=%s&h=%s", setId, user, pw)
 	// Create the file
 	dir := filepath.Dir(filePath)
 	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		return err
+	}
+	_, err = os.Stat(filePath)
+	if !os.IsNotExist(err) {
+		os.Remove(filePath)
+	}
 	out, err := os.Create(filePath)
 	if err != nil {
 		return err
@@ -88,7 +96,6 @@ func (this *service) SaveBeatmapFile(setId int) error {
 	}
 	err = this.db.SetDownloadedStatus(setId, true)
 	if err != nil {
-		log.Error("lol")
 		log.Error(err)
 	}
 	return nil

@@ -27,7 +27,7 @@ func Run(conf *config.Config, log *logger.Logger) {
 	})
 
 	if err != nil {
-		log.Fatal("Gorm error: %s", err)
+		log.Fatal("Gorm error: ", err)
 	}
 	// Initialize Router
 	r := router.New()
