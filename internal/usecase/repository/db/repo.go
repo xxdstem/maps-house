@@ -31,6 +31,10 @@ func (r *repo) InsertBeatmapSet(meta *entity.BeatmapMeta) error {
 	return r.db.Create(&meta).Error
 }
 
+func (r *repo) DeleteBeatmapSet(setId int) error {
+	return r.db.Delete(entity.BeatmapMeta{BeatmapsetID: setId}).Error
+}
+
 func (r *repo) SetDownloadedStatus(setId int, state bool) error {
 	meta := &entity.BeatmapMeta{BeatmapsetID: setId}
 	return r.db.Model(&meta).Update("Downloaded", state).Error

@@ -8,9 +8,11 @@ import (
 )
 
 type BeatmapsService interface {
-	CheckBeatmapAvailability(setId int) (*entity.BeatmapMeta, error)
+	CheckBeatmapAvailability(bm *entity.BeatmapMeta) error
 	SaveBeatmapFile(setId int) error
 	ServeBeatmap(setId int) ([]byte, error)
+	RemoveBeatmapFile(setId int) error
+	CheckUpdateConditions(bm *entity.BeatmapMeta) bool
 }
 
 type OsuApiService interface {
@@ -20,6 +22,8 @@ type OsuApiService interface {
 type DbRepository interface {
 	InsertBeatmapSet(meta *entity.BeatmapMeta) error
 	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
+	DeleteBeatmapSet(setId int) error
+	SetDownloadedStatus(setId int, state bool) error
 }
 
 type usecase struct {
@@ -93,8 +97,11 @@ func (uc *usecase) FetchBeatmapMeta(setId int) (*entity.BeatmapMeta, error) {
 
 func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 	// Downloading map
-	var bm *entity.BeatmapMeta
-	bm, err := uc.beatmapsService.CheckBeatmapAvailability(setId)
+	bm, err := uc.db.GetBeatmapsBySetId(setId)
+	if err != nil {
+		return nil, err
+	}
+	err = uc.beatmapsService.CheckBeatmapAvailability(bm)
 	if err != nil {
 		log.Error("[", setId, "] Beatmap availability check not passed")
 		bm, err := uc.FetchBeatmapMeta(setId)
@@ -107,24 +114,32 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 			return nil, err
 		}
 		err = uc.beatmapsService.SaveBeatmapFile(setId)
+		uc.db.SetDownloadedStatus(setId, true)
 		if err != nil {
 			log.Error("[", setId, "] Cannot save beatmap file")
 			return nil, err
 		}
 		log.Info("[", setId, "] Beatmap successfully downloaded")
-	} else if bm.Beatmaps[0].Ranked != 2 && time.Since(time.Unix(bm.ApiUpdate, 0))/24 > 3 {
+	} else if uc.beatmapsService.CheckUpdateConditions(bm) {
 		apiData, err := uc.FetchBeatmapMeta(setId)
 		if err != nil {
 			//remove map?
 			log.Info("[", setId, "] Cannot fetch beatmap meta, gonna remove map")
+			err = uc.beatmapsService.RemoveBeatmapFile(setId)
+			uc.db.DeleteBeatmapSet(setId)
 			return nil, err
 		}
 		if bm.LastUpdate < apiData.LastUpdate {
 			// re-download
 			log.Info("[", setId, "] Beatmap LastUpdate changed, re-downloading")
-			err = uc.beatmapsService.SaveBeatmapFile(setId)
-		}
 
+			// Maybe just update instead of deleting and inserting?
+			uc.db.DeleteBeatmapSet(setId)
+			uc.db.InsertBeatmapSet(apiData)
+
+			err = uc.beatmapsService.SaveBeatmapFile(setId)
+			uc.db.SetDownloadedStatus(setId, true)
+		}
 		// re-check if beatmap not updated
 	}
 	//then

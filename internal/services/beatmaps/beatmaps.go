@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 )
 
 // errors
@@ -18,44 +19,30 @@ var (
 	ErrorNotFoundFile = errors.New("not found file")
 )
 
-type DbRepository interface {
-	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
-	SetDownloadedStatus(setId int, state bool) error
-}
-
 type service struct {
-	db           DbRepository
 	PriorityPath string
 	MainPath     string
 }
 
 var log *logger.Logger
 
-func NewService(l *logger.Logger, db DbRepository, prior string, main string) *service {
+func NewService(l *logger.Logger, prior string, main string) *service {
 	log = l
-	return &service{db: db, PriorityPath: prior, MainPath: main}
+	return &service{PriorityPath: prior, MainPath: main}
 }
 
-func (this *service) CheckBeatmapAvailability(setId int) (*entity.BeatmapMeta, error) {
-	bm, err := this.db.GetBeatmapsBySetId(setId)
-	if err != nil {
-		return nil, err
-	}
-	if bm == nil {
-		return nil, ErrorNotFoundDb
-	}
+func (this *service) CheckBeatmapAvailability(bm *entity.BeatmapMeta) error {
 	if bm.Downloaded == false {
-		return nil, ErrorNotFoundFile
+		return ErrorNotFoundFile
 	}
-	filePath := this.setIdToPath(setId)
-	if _, err = os.Stat(filePath); err == nil {
-		return bm, nil
+	filePath := this.setIdToPath(bm.BeatmapsetID)
+	if _, err := os.Stat(filePath); err == nil {
+		return nil
 	}
-	return nil, ErrorNotFoundFile
+	return ErrorNotFoundFile
 }
 
 func (this *service) SaveBeatmapFile(setId int) error {
-
 	user := "Karanos"
 	pw := "3ab61ccb3678229a797bf4e48fb96f90"
 
@@ -94,9 +81,15 @@ func (this *service) SaveBeatmapFile(setId int) error {
 	if err != nil {
 		return err
 	}
-	err = this.db.SetDownloadedStatus(setId, true)
-	if err != nil {
-		log.Error(err)
+	return nil
+}
+
+func (this *service) RemoveBeatmapFile(setId int) error {
+	filePath := this.setIdToPath(setId)
+	// Create the file
+	_, err := os.Stat(filePath)
+	if !os.IsNotExist(err) {
+		return os.Remove(filePath)
 	}
 	return nil
 }
@@ -106,7 +99,7 @@ func (this *service) ServeBeatmap(setId int) ([]byte, error) {
 	file, err := os.Open(filePath)
 	fileInfo, err := file.Stat()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	fileSize := fileInfo.Size()
 	buffer := make([]byte, fileSize)
@@ -117,4 +110,9 @@ func (this *service) ServeBeatmap(setId int) ([]byte, error) {
 
 func (this *service) setIdToPath(setId int) string {
 	return filepath.Join(this.MainPath, strconv.Itoa(setId), "map.osz")
+}
+
+func (*service) CheckUpdateConditions(bm *entity.BeatmapMeta) bool {
+	return bm.Beatmaps[0].Ranked != 2 &&
+		time.Since(time.Unix(bm.ApiUpdate, 0))/24 > 3
 }

@@ -43,7 +43,7 @@ func Run(conf *config.Config, log *logger.Logger) {
 
 	// Initialize services
 	osuApiService := osuapi.NewService(log, conf.OsuApiKey)
-	beatmapsService := beatmaps.NewService(log, dbRepo, conf.Dirs.PriorityDir, conf.Dirs.MainDir)
+	beatmapsService := beatmaps.NewService(log, conf.Dirs.PriorityDir, conf.Dirs.MainDir)
 
 	// Initialize useCases
 	useCase := usecase.New(log, dbRepo, osuApiService, beatmapsService)
