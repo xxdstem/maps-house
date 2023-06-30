@@ -21,6 +21,7 @@ type OsuApiService interface {
 
 type DbRepository interface {
 	InsertBeatmapSet(meta *entity.BeatmapMeta) error
+	UpdateBeatmapSet(meta *entity.BeatmapMeta) error
 	GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error)
 	DeleteBeatmapSet(setId int) error
 	SetDownloadedStatus(setId int, state bool) error
@@ -133,9 +134,7 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 			// re-download
 			log.Info("[", setId, "] Beatmap LastUpdate changed, re-downloading")
 
-			// Maybe just update instead of deleting and inserting?
-			uc.db.DeleteBeatmapSet(setId)
-			uc.db.InsertBeatmapSet(apiData)
+			uc.db.UpdateBeatmapSet(apiData)
 
 			err = uc.beatmapsService.SaveBeatmapFile(setId)
 			uc.db.SetDownloadedStatus(setId, true)

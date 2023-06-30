@@ -31,6 +31,14 @@ func (r *repo) InsertBeatmapSet(meta *entity.BeatmapMeta) error {
 	return r.db.Create(&meta).Error
 }
 
+func (r *repo) UpdateBeatmapSet(meta *entity.BeatmapMeta) error {
+	// Need testing
+	// probably need to remove beatmaps before insertting
+	// cuz of some diffs could be removed and "Save" probably will just keep them.
+
+	return r.db.Save(&meta).Error
+}
+
 func (r *repo) DeleteBeatmapSet(setId int) error {
 	return r.db.Delete(entity.BeatmapMeta{BeatmapsetID: setId}).Error
 }
