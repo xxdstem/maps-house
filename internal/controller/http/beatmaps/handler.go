@@ -5,6 +5,7 @@ import (
 	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
 	"strconv"
+	"strings"
 
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
@@ -39,7 +40,13 @@ func (h *handler) Register(router *router.Router) {
 
 func (h *handler) DownloadMap(ctx *fasthttp.RequestCtx) {
 	setIdstr := ctx.UserValue("ID").(string)
+	setIdstr = strings.Split(setIdstr, "n")[0]
 	setId, _ := strconv.Atoi(setIdstr)
+	if setId == 0 {
+		log.Info("got", setIdstr)
+		ctx.WriteString("fuck you nigger")
+		return
+	}
 	beatmapFile, err := h.uc.DownloadMap(setId)
 	if err != nil {
 		ctx.WriteString(err.Error())
