@@ -32,6 +32,9 @@ func NewService(l *logger.Logger, prior string, main string) *service {
 }
 
 func (this *service) CheckBeatmapAvailability(bm *entity.BeatmapMeta) error {
+	if bm == nil {
+		return ErrorNotFoundDb
+	}
 	if bm.Downloaded == false {
 		return ErrorNotFoundFile
 	}
@@ -104,7 +107,7 @@ func (this *service) ServeBeatmap(setId int) ([]byte, error) {
 	fileSize := fileInfo.Size()
 	buffer := make([]byte, fileSize)
 	_, err = file.Read(buffer)
-	defer file.Close()
+	file.Close()
 	return buffer, err
 }
 

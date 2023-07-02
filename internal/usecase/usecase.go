@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"fmt"
 	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
@@ -54,6 +55,9 @@ func (uc *usecase) FetchBeatmapMeta(setId int) (*entity.BeatmapMeta, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(maps) == 0 {
+		return nil, errors.New("no beatmaps?")
+	}
 	var firstBeatmap entity.BeatmapDTO = maps[0]
 	var curTime time.Time = time.Now()
 	meta := entity.BeatmapMeta{
@@ -103,6 +107,7 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 		return nil, err
 	}
 	err = uc.beatmapsService.CheckBeatmapAvailability(bm)
+	bmInDB := bm != nil
 	if err != nil {
 		log.Error("[", setId, "] Beatmap availability check not passed")
 		bm, err := uc.FetchBeatmapMeta(setId)
@@ -110,10 +115,13 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 			log.Error("[", setId, "] Beatmap available, cannot fetch beatmap meta")
 			return nil, err
 		}
-		err = uc.db.InsertBeatmapSet(bm)
-		if err != nil {
-			return nil, err
+		if !bmInDB {
+			err = uc.db.InsertBeatmapSet(bm)
+			if err != nil {
+				return nil, err
+			}
 		}
+
 		err = uc.beatmapsService.SaveBeatmapFile(setId)
 		uc.db.SetDownloadedStatus(setId, true)
 		if err != nil {
@@ -121,6 +129,7 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 			return nil, err
 		}
 		log.Info("[", setId, "] Beatmap successfully downloaded")
+		return uc.ServeBeatmap(setId, bm)
 	} else if uc.beatmapsService.CheckUpdateConditions(bm) {
 		apiData, err := uc.FetchBeatmapMeta(setId)
 		if err != nil {
@@ -146,6 +155,9 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 }
 
 func (uc *usecase) ServeBeatmap(setId int, beatmap *entity.BeatmapMeta) (*entity.BeatmapFile, error) {
+	if beatmap == nil {
+		return nil, errors.New("haven't got beatmap in serve?")
+	}
 	body, err := uc.beatmapsService.ServeBeatmap(setId)
 	if err != nil {
 		return nil, err

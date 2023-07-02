@@ -21,8 +21,15 @@ func (r *repo) GetBeatmapsBySetId(setId int) (*entity.BeatmapMeta, error) {
 	if err != nil {
 		return nil, err
 	}
+	if result.BeatmapsetID == 0 {
+		return nil, nil
+	}
 	if len(result.Beatmaps) == 0 {
-		result = nil
+		err = r.db.Model(&[]entity.Beatmap{}).Where(&entity.Beatmap{BeatmapsetID: setId}).Find(&result.Beatmaps).Error
+		if err != nil || len(result.Beatmaps) == 0 {
+			r.DeleteBeatmapSet(setId)
+			result = nil
+		}
 	}
 	return result, nil
 }
@@ -40,7 +47,8 @@ func (r *repo) UpdateBeatmapSet(meta *entity.BeatmapMeta) error {
 }
 
 func (r *repo) DeleteBeatmapSet(setId int) error {
-	return r.db.Delete(entity.BeatmapMeta{BeatmapsetID: setId}).Error
+	r.db.Delete(&entity.Beatmap{}, setId)
+	return r.db.Delete(&entity.BeatmapMeta{}, setId).Error
 }
 
 func (r *repo) SetDownloadedStatus(setId int, state bool) error {
