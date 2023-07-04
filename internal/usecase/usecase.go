@@ -10,7 +10,7 @@ import (
 
 type BeatmapsService interface {
 	CheckBeatmapAvailability(bm *entity.BeatmapMeta) error
-	SaveBeatmapFile(setId int) error
+	SaveBeatmapFile(setId int, chimu bool) error
 	ServeBeatmap(setId int) ([]byte, error)
 	RemoveBeatmapFile(setId int) error
 	CheckUpdateConditions(bm *entity.BeatmapMeta) bool
@@ -122,12 +122,13 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 			}
 		}
 
-		err = uc.beatmapsService.SaveBeatmapFile(setId)
-		uc.db.SetDownloadedStatus(setId, true)
+		err = uc.beatmapsService.SaveBeatmapFile(setId, false)
 		if err != nil {
 			log.Error("[", setId, "] Cannot save beatmap file")
 			return nil, err
 		}
+		uc.db.SetDownloadedStatus(setId, true)
+
 		log.Info("[", setId, "] Beatmap successfully downloaded")
 		return uc.ServeBeatmap(setId, bm)
 	} else if uc.beatmapsService.CheckUpdateConditions(bm) {
@@ -145,7 +146,10 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 
 			uc.db.UpdateBeatmapSet(apiData)
 
-			err = uc.beatmapsService.SaveBeatmapFile(setId)
+			err = uc.beatmapsService.SaveBeatmapFile(setId, false)
+			if err != nil {
+				return nil, err
+			}
 			uc.db.SetDownloadedStatus(setId, true)
 		}
 		// re-check if beatmap not updated

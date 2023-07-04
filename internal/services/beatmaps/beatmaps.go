@@ -3,7 +3,7 @@ package beatmaps
 import (
 	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
 	"net/http"
@@ -39,18 +39,27 @@ func (this *service) CheckBeatmapAvailability(bm *entity.BeatmapMeta) error {
 		return ErrorNotFoundFile
 	}
 	filePath := this.setIdToPath(bm.BeatmapsetID)
-	if _, err := os.Stat(filePath); err == nil {
+	if stat, err := os.Stat(filePath); err == nil {
+		if stat.Size() < 100*1024 {
+			os.Remove(filePath)
+			return ErrorNotFoundFile
+		}
 		return nil
 	}
 	return ErrorNotFoundFile
 }
 
-func (this *service) SaveBeatmapFile(setId int) error {
+func (this *service) SaveBeatmapFile(setId int, chimu bool) error {
 	user := "Karanos"
 	pw := "3ab61ccb3678229a797bf4e48fb96f90"
 
 	filePath := this.setIdToPath(setId)
-	url := fmt.Sprintf("https://osu.ppy.sh/d/%dn?u=%s&h=%s", setId, user, pw)
+	var url string
+	if chimu {
+		url = fmt.Sprintf("https://chimu.mode/d/%dn", setId)
+	} else {
+		url = fmt.Sprintf("https://osu.ppy.sh/d/%dn?u=%s&h=%s", setId, user, pw)
+	}
 	// Create the file
 	dir := filepath.Dir(filePath)
 	err := os.MkdirAll(dir, 0755)
@@ -78,9 +87,19 @@ func (this *service) SaveBeatmapFile(setId int) error {
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
-
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
 	// Writer the body to file
-	_, err = io.Copy(out, resp.Body)
+	if len(body) < 100*1024 {
+		if chimu {
+			return errors.New("fuck")
+		}
+		return this.SaveBeatmapFile(setId, true)
+	}
+
+	_, err = out.Write(body)
 	if err != nil {
 		return err
 	}
