@@ -56,7 +56,7 @@ func (this *service) SaveBeatmapFile(setId int, chimu bool) error {
 	filePath := this.setIdToPath(setId)
 	var url string
 	if chimu {
-		url = fmt.Sprintf("https://chimu.mode/d/%dn", setId)
+		url = fmt.Sprintf("https://chimu.moe/d/%dn", setId)
 	} else {
 		url = fmt.Sprintf("https://osu.ppy.sh/d/%dn?u=%s&h=%s", setId, user, pw)
 	}
