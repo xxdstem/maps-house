@@ -52,6 +52,10 @@ func (h *handler) DownloadMap(ctx *fasthttp.RequestCtx) {
 		ctx.WriteString(err.Error())
 		return
 	}
+	if beatmapFile == nil {
+		ctx.WriteString("something fucked up.")
+		return
+	}
 
 	ctx.Write(beatmapFile.Body)
 	ctx.Response.Header.Add("Content-type", "application/octet-stream")
