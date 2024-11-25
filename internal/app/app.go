@@ -10,7 +10,6 @@ import (
 	"maps-house/internal/workers/cleaner"
 	"maps-house/pkg/logger"
 
-	"github.com/DataDog/datadog-go/v5/statsd"
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 	"gorm.io/driver/postgres"
@@ -22,7 +21,7 @@ const dataDogKey = "f983d1a4debdb5c7d46df7830d09fd5ddb125f82"
 
 func Run(conf *config.Config, log *logger.Logger) {
 
-	statsd.New()
+	//statsd.New()
 	// Build DSN string (probably could a better way)
 	dsn := conf.DSNBuilder()
 
@@ -48,7 +47,7 @@ func Run(conf *config.Config, log *logger.Logger) {
 
 	// Initialize services
 	osuApiService := osuapi.NewService(log, conf.OsuApiKey)
-	beatmapsService := beatmaps.NewService(log, conf.Dirs.PriorityDir, conf.Dirs.MainDir)
+	beatmapsService := beatmaps.NewService(log, conf.MapsPath)
 
 	// Initialize useCases
 	useCase := usecase.New(log, dbRepo, osuApiService, beatmapsService)
