@@ -3,7 +3,7 @@ package beatmaps
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"maps-house/internal/entity"
 	"maps-house/pkg/logger"
 	"net/http"
@@ -35,7 +35,7 @@ func (this *service) CheckBeatmapAvailability(bm *entity.BeatmapMeta) error {
 	if bm == nil {
 		return ErrorNotFoundDb
 	}
-	if bm.Downloaded == false {
+	if !bm.Downloaded {
 		return ErrorNotFoundFile
 	}
 	filePath := this.setIdToPath(bm.BeatmapsetID)
@@ -84,10 +84,10 @@ func (this *service) SaveBeatmapFile(setId int, chimu bool) error {
 	defer resp.Body.Close()
 
 	// Check server response
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK || resp.Header.Get("Content-Disposition") == "" {
 		return fmt.Errorf("bad status: %s", resp.Status)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}

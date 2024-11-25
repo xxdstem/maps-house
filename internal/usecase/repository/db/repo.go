@@ -2,6 +2,7 @@ package db
 
 import (
 	"maps-house/internal/entity"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -53,5 +54,5 @@ func (r *repo) DeleteBeatmapSet(setId int) error {
 
 func (r *repo) SetDownloadedStatus(setId int, state bool) error {
 	meta := &entity.BeatmapMeta{BeatmapsetID: setId}
-	return r.db.Model(&meta).Update("Downloaded", state).Error
+	return r.db.Model(&meta).Update("Downloaded", state).Update("LatestFetch", time.Now().Unix()).Error
 }

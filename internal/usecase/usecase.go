@@ -127,10 +127,7 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 			log.Error("[", setId, "] Cannot save beatmap file")
 			return nil, err
 		}
-		uc.db.SetDownloadedStatus(setId, true)
-
 		log.Info("[", setId, "] Beatmap successfully downloaded")
-		return uc.ServeBeatmap(setId, bm)
 	} else if uc.beatmapsService.CheckUpdateConditions(bm) {
 		apiData, err := uc.FetchBeatmapMeta(setId)
 		if err != nil {
@@ -150,10 +147,10 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 			if err != nil {
 				return nil, err
 			}
-			uc.db.SetDownloadedStatus(setId, true)
 		}
 		// re-check if beatmap not updated
 	}
+	uc.db.SetDownloadedStatus(setId, true)
 	//then
 	return uc.ServeBeatmap(setId, bm)
 }

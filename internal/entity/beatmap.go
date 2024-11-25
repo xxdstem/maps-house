@@ -13,6 +13,7 @@ type BeatmapMeta struct {
 	Downloaded   bool       `json:"is_downloaded" gorm:"column:is_downloaded"`
 	ApiUpdate    int64      `json:"api_update" gorm:"column:api_update"`
 	LastUpdate   int64      `json:"last_update" gorm:"column:latest_update;type:int"`
+	LatestFetch  int64      `json:"latest_fetch" gorm:"column:latest_fetch;type:int"`
 	Beatmaps     []*Beatmap `json:"beatmaps" gorm:"foreignKey:BeatmapsetID;references:BeatmapsetID"`
 }
 
