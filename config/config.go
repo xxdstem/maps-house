@@ -12,7 +12,7 @@ type Config struct {
 	OsuApiKey     string
 	SecretKey     string
 	Workers       int
-	Dirs          dirs
+	MapsPath      string
 	DB_Host       string `mapstructure:"POSTGRES_HOST"`
 	DB_Name       string `mapstructure:"POSTGRES_DB"`
 	DB_Port       string `mapstructure:"POSTGRES_PORT"`
@@ -20,19 +20,11 @@ type Config struct {
 	DB_Password   string `mapstructure:"POSTGRES_PASSWORD"`
 }
 
-type dirs struct {
-	PriorityDir string
-	MainDir     string
-}
-
 func NewConfig(logger *logger.Logger) (*Config, error) {
 	c := Config{
 		ListenAddress: ":8000",
 		Workers:       2,
-		Dirs: dirs{
-			PriorityDir: "./.data/priority/",
-			MainDir:     "./.data/main/",
-		},
+		MapsPath:      "/mnt/maps/maps",
 	}
 	viper.AddConfigPath(".")
 	viper.SetConfigType("env")

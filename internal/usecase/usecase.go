@@ -152,6 +152,11 @@ func (uc *usecase) DownloadMap(setId int) (*entity.BeatmapFile, error) {
 	}
 	uc.db.SetDownloadedStatus(setId, true)
 	//then
+	if bm == nil {
+		if bm, err = uc.FetchBeatmapMeta(setId); err != nil {
+			return nil, err
+		}
+	}
 	return uc.ServeBeatmap(setId, bm)
 }
 

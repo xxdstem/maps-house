@@ -20,15 +20,14 @@ var (
 )
 
 type service struct {
-	PriorityPath string
-	MainPath     string
+	MapsPath string
 }
 
 var log *logger.Logger
 
-func NewService(l *logger.Logger, prior string, main string) *service {
+func NewService(l *logger.Logger, path string) *service {
 	log = l
-	return &service{PriorityPath: prior, MainPath: main}
+	return &service{MapsPath: path}
 }
 
 func (this *service) CheckBeatmapAvailability(bm *entity.BeatmapMeta) error {
@@ -131,7 +130,7 @@ func (this *service) ServeBeatmap(setId int) ([]byte, error) {
 }
 
 func (this *service) setIdToPath(setId int) string {
-	return filepath.Join(this.MainPath, strconv.Itoa(setId), "map.osz")
+	return filepath.Join(this.MapsPath, strconv.Itoa(setId), "map.osz")
 }
 
 func (*service) CheckUpdateConditions(bm *entity.BeatmapMeta) bool {
