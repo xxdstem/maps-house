@@ -36,7 +36,6 @@ func (w *cleaner) check() {
 		if err != nil {
 			log.Error(err)
 		} else {
-			log.Info("first", len(result))
 			for _, v := range result {
 				err = db.Model(&[]entity.Beatmap{}).Where(&entity.Beatmap{BeatmapsetID: v.BeatmapsetID}).Find(&v.Beatmaps).Error
 				if err != nil {
