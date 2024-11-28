@@ -11,8 +11,6 @@ services:
       - 7777:8080
     env_file:
       - ./app.env
-    environment:
-      - POSTGRES_PORT=5432
     depends_on:
       - postgres
     container_name: maps-house
